@@ -8,3 +8,4 @@ print('배고프다')
 
 print('영상을 찍자')
 print('어려워')
+print(1)
