@@ -17,9 +17,16 @@ print('정구찌')
 print('보고싶다')
 print('힝힝')
 
+
+
+
+
+
 print(2)
 print(3)
 print(4)
 
 print('과제중')
 print('레포트 쓰는 중')
+
+#test2
