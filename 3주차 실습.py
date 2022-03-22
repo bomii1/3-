@@ -8,3 +8,4 @@ print('배고프다')
 
 print('영상을 찍자')
 #zzzzz
+print('영상을 찍는 중')
