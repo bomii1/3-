@@ -19,18 +19,18 @@ class Stack:
       return len(self.items)
 
 def solve(A):
-   result = 0
-   balanced = 0
+   result = 0 #출력값
+   balanced = 0 #균형 부문자열
    for i in range(len(A)):
-      for_0 = Stack()
-      for_1 = Stack()
+      for_0 = Stack() # 0을 넣을 스택
+      for_1 = Stack() # 1을 넣을 스택
       for j in range(i,len(A)):
          if A[j] == '0':
             for_0.push(A[j])
          else:
             for_1.push(A[j])
-         if len(for_0) != 0 and len(for_1) != 0 and (len(for_0) == len(for_1)):
-            balanced = len(for_0) * 2
+         if len(for_0) != 0 and len(for_1) != 0 and (len(for_0) == len(for_1)): #스택 안 원소의 갯수가 둘 다 1이 아니고 두 스택의 원소의 갯수가 동일할 때
+            balanced = len(for_0) * 2 
             print('balanced =', balanced)
       if result < balanced:
          result = balanced
