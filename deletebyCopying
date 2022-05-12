@@ -1,0 +1,38 @@
+def deleteByCopying(self, x):
+		pt = x.parent
+		L = x.left
+		R = x.right
+		if L:
+			y = x.left
+			while y.right:
+				y = y.right
+			x.key = y.key
+			if y.left:
+				y.left.parent = y.parent
+			if y.parent.left is y:
+				y.parent.left = y.left
+			else:
+				y.parent.right = y.left
+			del y
+		elif not L and R:
+			y = R
+			while y.left:
+				y = y.left
+			x.key = y.key
+			if y.right:
+				y.right.parent = y.parent
+			if y.parent.left is y:
+				y.parent.left = y.right
+			else:
+				y.parent.right = y.right
+			del y
+		else:	
+			if pt == None:
+				self.root = None
+			else:
+				if pt.left is x:
+					pt.left = None
+				else:
+					pt.right = None
+			del x
+		self.size -= 1
