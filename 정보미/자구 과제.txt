@@ -1,4 +1,4 @@
-class Stack:
+class Stack: #무분자열을 넣을 스택 클래스 선언
    def __init__(self):
       self.items = []
    def push(self, val):
