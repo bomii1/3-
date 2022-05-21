@@ -15,7 +15,20 @@ class Tree:
 	def __len__(self):
 		return self.size
 	
-	#def cal_height(self):
+	def cal_height(self):
+		while v != None:
+			v_right = -1
+			v_left = -1
+			if v.right != None:
+				v_right = v.right.height
+			elif v.left != None:
+				v_left = v.left.height
+			if v_right >= v_left:
+				v.height = v_right + 1
+			else:
+				v.height = v_left + 1
+			v = v.parent
+	
 
 	def preorder(self, v):
 		if v!= None:
