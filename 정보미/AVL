@@ -1,0 +1,303 @@
+class Node:
+	def __init__(self, key):
+		self.key = key
+		self.parent = self.left = self.right = None
+		self.height = 0  # 높이 정보도 유지함에 유의!!
+
+
+class BST:
+	def __init__(self):
+		self.root = None
+		self.size = 0
+		
+	def __len__(self):
+		return self.size
+	
+	def cal_height(self, v):
+		while v != None:
+			v_right = -1
+			v_left = -1
+			if v.right != None:
+				v_right = v.right.height
+			elif v.left != None:
+				v_left = v.left.height
+			if v_right >= v_left:
+				v.height = v_right + 1
+			else:
+				v.height = v_left + 1
+			v = v.parent
+	
+
+	def preorder(self, v):
+		if v != None:
+			print(v.key, end=' ')
+			self.preorder(v.left)
+			self.preorder(v.right)
+
+	def inorder(self, v):
+		if v != None:
+			self.inorder(v.left)
+			print(v.key, end = ' ')
+			self.inorder(v.right)
+
+	def postorder(self, v):
+		if v != None:
+			self.postorder(v.left)
+			self.postorder(v.right)
+			print(v.key, end = ' ')
+
+	def find_loc(self, key):
+		if self.size == 0:
+			return None
+		p = None
+		v = self.root
+		while v:
+			if v.key == key:
+				return v
+			elif v.key > key:
+				p = v
+				v = v.left
+			else:
+				p = v
+				v = v.right
+		return p
+
+	def search(self, key):
+		p = self.find_loc(key)
+		if p and p.key == key: # (p != None) and (p.key == key), 찾는 key 값이 tree에 있을 때
+			return p
+		else: # 찾는 key 값이 tree에 없을 때
+			return None
+
+	def insert(self, key):
+	# 노드들의 height 정보 update 필요
+	# key가 이미 트리에 있다면 에러 출력없이 None만 리턴!
+		p = self.find_loc(key)
+		if p == None or p.key != key:
+			v = Node(key)
+			if p == None:
+				self.root = v
+			else:
+				v.parent = p
+				if p.key >= key:
+					p.left = v
+				else:
+					p.right = v
+		self.size += 1
+		self.cal_height(v)
+		return v
+
+	def deleteByMerging(self, x):
+	# 노드들의 height 정보 update 필요
+		a, b, pt = x.left, x.right, x.parent
+		if a == None: c = b
+		else: # a != None
+			c = m = a
+			# find the largest leaf m in the subtree of a
+			while m.right:
+				m = m.right
+			m.right = b
+			if b: b.parent = m
+		if self.root == x: # c becomes a new root
+			if c: c.parent = None
+			self.root = c
+		else:		# c becomes a child of pt of x
+			if pt.left == x: pt.left = c
+			else: pt.right = c
+			if c: c.parent = pt
+		self.size -= 1
+		self.cal_height(pt)
+		return pt
+
+	def deleteByCopying(self, x):
+	# 노드들의 height 정보 update 필요
+		pt = x.parent
+		L = x.left
+		R = x.right
+		if L:
+			y = x.left
+			while y.right:
+				y = y.right
+			x.key = y.key
+			if y.left:
+				y.left.parent = y.parent
+			if y.parent.left is y:
+				y.parent.left = y.left
+			else:
+				y.parent.right = y.left
+			del y
+		elif not L and R:
+			y = R
+			while y.left:
+				y = y.left
+			x.key = y.key
+			if y.right:
+				y.right.parent = y.parent
+			if y.parent.left is y:
+				y.parent.left = y.right
+			else:
+				y.parent.right = y.right
+			del y
+		else:	
+			if pt == None:
+				self.root = None
+			else:
+				if pt.left is x:
+					pt.left = None
+				else:
+					pt.right = None
+		key_x = x.key
+		del x
+		# 삭제로 인해 노드의 높이가 바뀔 수 있는 가장 깊은 노드를 리턴하기 위한 코드
+		self.size -= 1
+		self.cal_height(pt)
+		if pt == None:
+			#print('들어옴')
+			return pt
+		else:
+			#print('왜')
+			return pt.parent
+
+	def height(self, x): # 노드 x의 height 값을 리턴
+		if x == None: return -1
+		else:
+			return x.height
+	
+	def succ(self, x): # key값의 오름차순 순서에서 x.key 값의 다음 노드(successor) 리턴
+	# x의 successor가 없다면 (즉, x.key가 최대값이면) None 리턴
+		if self.size == 1 or x.right == None:
+			return None
+		if x.right:
+			return x.right
+		else:
+			return None
+		
+	def pred(self, x): # key값의 오름차순 순서에서 x.key 값의 이전 노드(predecssor) 리턴
+	# x의 predecessor가 없다면 (즉, x.key가 최소값이면) None 리턴
+		if self.size == 1 or x.left == None:
+			return None
+		if x.left:
+			return x.left
+		else:
+			return None
+		
+	def rotateLeft(self, z): # 균형이진탐색트리의 1차시 동영상 시청 필요 (height 정보 수정 필요)
+		x = z.right
+		if x == None:
+			return
+		b = x.left
+		x.parent = z.parent
+		if z.parent:
+			if z.parent.left == z:
+				z.parent.left = x
+			else:
+				z.parent.right = x
+		if x:
+			x.left = z
+			z.parent = x
+			z.right = b
+		if b:
+			b.parent = z
+		if z == self.root and z != None:
+			self.root = x
+		self.cal_height(z)
+		
+	def rotateRight(self, z):	 # rotateLeft도 유사하게 정의
+		x = z.left	             # assume that z != None 
+		if x == None: 
+			return
+		b = x.right              # b == None 인 경우도 가능
+		x.parent = z.parent
+		if z.parent:
+			if z.parent.left == z:
+				z.parent.left = x
+			else: 
+				z.parent.right = x
+		if x: 
+			x.right = z
+			z.parent = x 
+			z.left = b
+		if b: 
+			b.parent = z
+		# z == self.root라면 x가 새로운 루트가 되어야 함!
+		if z == self.root and z != None:
+			self.root = x
+		self.cal_height(z)
+		
+class AVL(BST):
+	def __init__(self):
+		self.root = None
+		self.size = 0
+		
+	def rebalance(self, x, y, z):
+		# assure that x, y, z != None
+		# return the new 'top' node after rotations
+		# z - y - x의 경우(linear vs. triangle)에 따라 회전해서 균형잡음
+		#v = super(AVL, self).rotateRight(z)
+		if z.right == y and y.left == x: # right triangle
+			self.rotateRight(y)
+			self.rotateLeft(z)
+			return x
+		elif z.left == y and y.right == x: # left triangle
+			self.rotateLeft(y)
+			self.rotateRight(z)
+			return x
+		elif z.right == y and y.right == x: # right linear
+			self.rotateLeft(z)
+			return y
+		elif z.left == y and y.left == x: # left linear
+			self.rotateRight(z)
+			return y
+		self.cal_height(x)
+		self.cal_height(y)
+		self.cal_height(z)
+		
+			
+
+	def insert(self, key):
+		# BST에서도 같은 이름의 insert가 있으므로, BST의 insert 함수를 호출하려면 
+		# super(class_name, instance_name).method()으로 호출
+		# 새로 삽입된 노드가 리턴됨에 유의!
+		v = super(AVL, self).insert(key)
+		#print('##258##', v.key, type(v))
+		# x, y, z를 찾아 rebalance(x, y, z)를 호출
+		if self.size < 3: # 사이즈가 2보다 작을 경우 - 루트노드 + 자식노드 1개
+			self.cal_height(v)
+		else: # 사이즈가 3 이상인 경우
+			x = v
+			y = v.parent
+			z = v.parent.parent
+			if z.height - x.height >= 2: # z와 x의 높이 차가 2이상 날 때 케이스를 나누어 분류
+				if z.right == None or z.left == None:  # z의 자식노드 둘 중 하나가 None 인 경우: linear
+					self.rebalance(x,y,z)
+				else: # z의 자식 양쪽 자식 노드가 다 존재하는 경우
+					if z.right.height - x.height < 2 or z.left.height - x.height < 2:
+						self.cal_height(v)
+		return v
+			
+	def delete(self, u): # delete the node u
+		v = super(AVL,self).deleteByCopying(u) 
+		# 또는 self.deleteByMerging을 호출가능하다. 그러나 이 과제에서는 deleteByCopying으로 호출한다
+		# height가 변경될 수 있는 가장 깊이 있는 노드를 리턴받아 v에 저장
+		if v == None:
+			pass
+		else:
+			while v != None: 
+				self.cal_height(v)
+				if abs(v.right.height - v.left.height) >= 2:
+					z = v
+					if z.left.height >= z.right.height:
+						y = z.left
+					else:
+						y = z.right
+					if y.left.height >= y.right.height:
+						x = y.left
+					else: 
+						x = y.right
+					v = self.rebalance(x,y,z)
+				w = v
+				v = v.parent
+			self.root = w
+		# v가 AVL 높이조건을 만족하는지 보면서 루트 방향으로 이동
+		# z - y - x를 정한 후, rebalance(x, y, z)을 호출
+		return 
